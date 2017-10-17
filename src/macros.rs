@@ -1,4 +1,5 @@
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! assert_ok {
     ($e:expr) => ({
@@ -9,6 +10,7 @@ macro_rules! assert_ok {
     });
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! assert_err {
     ($e:expr) => ({

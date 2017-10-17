@@ -8,13 +8,14 @@ use std::char::{
     EscapeDebug, EscapeDefault, EscapeUnicode
 };
 
+///a `char` wrapper with a "is us-ascii" soft constraint
 #[derive(
     Debug, Default, Copy, Clone, PartialEq, Eq, 
     PartialOrd, Ord, Hash
 )]
 pub struct SoftAsciiChar(char);
 
-/// a char wrapper with a "is us-ascii" soft constaints
+
 impl SoftAsciiChar {
 
     #[inline]
@@ -59,14 +60,14 @@ impl Into<char> for SoftAsciiChar {
 
 //Deref does not work as all `&self`-logic methods use `self` because Self: Copy
 macro_rules! impl_wrapping {
-    (pub > $(fn $name:ident(self$(, $param:ident: $tp:ty)*) -> $ret:ty),*) => ($(
-        impl SoftAsciiChar {
+    (pub > $(fn $name:ident(self$(, $param:ident: $tp:ty)*) -> $ret:ty),*) => (
+        impl SoftAsciiChar {$(
             #[inline]
             pub fn $name(self $(, $param: $tp)*) -> $ret {
                 char::$name(self.0 $(, $param)*)
             }
-        }
-    )*)
+        )*}
+    );
 }
 
 impl_wrapping! {

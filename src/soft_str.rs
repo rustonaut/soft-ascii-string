@@ -18,10 +18,7 @@ use std::iter::{Iterator, DoubleEndedIterator};
 use super::SoftAsciiChar;
 use super::SoftAsciiString;
 
-#[derive(Debug,  PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct SoftAsciiStr(str);
-
-/// A `str` wrapper adding a soft "is ascci" constraint.
+/// A `str` wrapper adding a "is us-ascii" soft constraint.
 ///
 /// This means that it should be ascii but is not guranteed to be
 /// ascii. Which means non ascii chars _are not a safty issue_ just
@@ -32,15 +29,19 @@ pub struct SoftAsciiStr(str);
 ///      strict AsciiStr
 ///   2. you rarely have to strictly rely on the value beeing ascii
 ///
-/// 
+///
 /// # Note
 /// Some functions which should be implemented directly
 /// on `SoftAsciiStr` like e.g. `trim_matches` are only
 /// provided through `.as_str()`. This
-/// is because the Pattern API and SliceIndex API is unstable 
+/// is because the Pattern API and SliceIndex API is unstable
 /// i.e. can only be implemented in unstable for now.
 /// Once it gets stabilized (rust #27721/#35729) implementations
 /// can be added
+#[derive(Debug,  PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct SoftAsciiStr(str);
+
+
 impl SoftAsciiStr {
     
     #[inline]
@@ -56,7 +57,7 @@ impl SoftAsciiStr {
         }
     }
 
-    /// returns checks if the "should be ascii soft constraint" is still valid
+    /// reruns checks if the "is us-ascii" soft constraint is still valid
     pub fn revalidate_soft_constraint(&self) -> Result<&Self, &str> {
         if self.is_ascii() {
             Ok(self)
@@ -158,16 +159,16 @@ impl_wrap_returning_string!{
 }
 
 macro_rules! impl_wrap_returning_str {
-    (pub > $(fn $name:ident(&self$(, $param:ident: $tp:ty)*)),*) => ($(
-        impl SoftAsciiStr {
+    (pub > $(fn $name:ident(&self$(, $param:ident: $tp:ty)*)),*) => (
+        impl SoftAsciiStr {$(
             #[inline]
             pub fn $name(&self $(, $param: $tp)*) -> &SoftAsciiStr {
                 let as_str = self.as_str();
                 let res = str::$name(as_str $(, $param)*);
                 SoftAsciiStr::from_str_unchecked(res)
             }
-        }
-    )*)
+        )*}
+    );
 }
 
 impl_wrap_returning_str!{
@@ -178,14 +179,14 @@ impl_wrap_returning_str!{
 }
 
 macro_rules! impl_wrapping {
-    (pub > $(fn $name:ident(&self$(, $param:ident: $tp:ty)*) -> $ret:ty),*) => ($(
-        impl SoftAsciiStr {
+    (pub > $(fn $name:ident(&self$(, $param:ident: $tp:ty)*) -> $ret:ty),*) => (
+        impl SoftAsciiStr {$(
             #[inline]
             pub fn $name(&self $(, $param: $tp)*) -> $ret {
                 str::$name(self.as_str() $(, $param)*)
             }
-        }
-    )*)
+        )*}
+    )
 }
 
 impl_wrapping! {
@@ -345,7 +346,10 @@ impl ToSocketAddrs for SoftAsciiStr {
     }
 }
 
-
+/// a wrapper around `Chars` turning each char into a `SoftAsciiChar`
+///
+/// This iterator is returned by `SoftAsciiChar::chars(&self)` instead
+/// of `Chars`.
 #[derive(Debug, Clone)]
 pub struct SoftAsciiChars<'a> {
     inner: str::Chars<'a>
@@ -391,7 +395,10 @@ impl<'a> DoubleEndedIterator for SoftAsciiChars<'a> {
     }
 }
 
-
+/// a wrapper around `CharsIndices` turning each char into a `SoftAsciiChar`
+///
+/// This iterator is returned by `SoftAsciiChar::char_indices(&self)` instead
+/// of `CharIndices`.
 #[derive(Debug, Clone)]
 pub struct SoftAsciiCharIndices<'a> {
     inner: str::CharIndices<'a>
@@ -442,6 +449,10 @@ impl<'a> DoubleEndedIterator for SoftAsciiCharIndices<'a> {
     }
 }
 
+/// a wrapper around `Lines` turning each line into a `SoftAsciiStr`
+///
+/// This iterator is returned by `SoftAsciiChar::lines(&self)` instead
+/// of `Lines`.
 #[derive(Debug, Clone)]
 pub struct SoftAsciiLines<'a> {
     inner: str::Lines<'a>
@@ -476,6 +487,10 @@ impl<'a> DoubleEndedIterator for SoftAsciiLines<'a> {
     }
 }
 
+/// a wrapper around `SplitWhitespace` turning each section into a `SoftAsciiStr`
+///
+/// This iterator is returned by `SoftAsciiChar::split_whitespace(&self)` instead
+/// of `SplitWhitespace`.
 #[derive(Clone)]
 pub struct SoftAsciiSplitWhitespace<'a> {
     inner: str::SplitWhitespace<'a>

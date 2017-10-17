@@ -17,6 +17,7 @@ use std::{io, vec};
 use super::SoftAsciiChar;
 use super::SoftAsciiStr;
 
+/// a `String` wrapper with an additional "is us-ascii" soft constraint
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct SoftAsciiString(String);
 
@@ -127,14 +128,14 @@ impl SoftAsciiString {
 }
 
 macro_rules! impl_wrapping {
-    (pub > $(fn $name:ident(&self$(, $param:ident: $tp:ty)*) -> $ret:ty),*) => ($(
-        impl SoftAsciiString {
+    (pub > $(fn $name:ident(&self$(, $param:ident: $tp:ty)*) -> $ret:ty),*) => (
+        impl SoftAsciiString {$(
             #[inline]
             pub fn $name(&self $(, $param: $tp)*) -> $ret {
                 String::$name(&self.0 $(, $param)*)
             }
-        }
-    )*)
+        )*}
+    )
 }
 
 impl_wrapping! {
@@ -147,14 +148,14 @@ impl_wrapping! {
 }
 
 macro_rules! impl_wrapping_mut {
-    (pub > $(fn $name:ident(&mut self$(, $param:ident: $tp:ty)*) -> $ret:ty),*) => ($(
-        impl SoftAsciiString {
+    (pub > $(fn $name:ident(&mut self$(, $param:ident: $tp:ty)*) -> $ret:ty),*) => (
+        impl SoftAsciiString {$(
             #[inline]
             pub fn $name(&mut self $(, $param: $tp)*) -> $ret {
                 String::$name(&mut self.0 $(, $param)*)
             }
-        }
-    )*)
+        )*}
+    )
 }
 
 impl_wrapping_mut! {
