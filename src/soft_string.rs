@@ -443,6 +443,13 @@ impl Into<Vec<u8>> for SoftAsciiString {
     }
 }
 
+impl Into<String> for SoftAsciiString {
+    #[inline]
+    fn into(self) -> String {
+        self.0
+    }
+}
+
 
 
 #[cfg(test)]
@@ -531,6 +538,13 @@ mod tests {
             let sas = SoftAsciiString::from_string_unchecked("test");
             let v: Vec<u8> = sas.into();
             assert_eq!(v.as_slice(), b"test" as &[u8]);
+        }
+
+        #[test]
+        fn has_into_string() {
+            let sas = SoftAsciiString::from_string_unchecked("test");
+            let v: String = sas.into();
+            assert_eq!(v, "test");
         }
     }
 }
