@@ -23,7 +23,7 @@ pub struct SoftAsciiString(String);
 
 impl SoftAsciiString {
 
-    #[inline]
+    #[inline(always)]
     pub fn from_string_unchecked<S: Into<String>>(s: S) -> Self {
         SoftAsciiString(s.into())
     }
@@ -435,6 +435,14 @@ impl Display for SoftAsciiString {
     }
 }
 
+impl Into<Vec<u8>> for SoftAsciiString {
+
+    #[inline]
+    fn into(self) -> Vec<u8> {
+        self.0.into()
+    }
+}
+
 
 
 #[cfg(test)]
@@ -516,6 +524,13 @@ mod tests {
             let bad: SoftAsciiString =
                 SoftAsciiString::from_string_unchecked(SOME_NOT_ASCII);
             assert_err!(bad.revalidate_soft_constraint());
+        }
+
+        #[test]
+        fn has_into_vec_u8() {
+            let sas = SoftAsciiString::from_string_unchecked("test");
+            let v: Vec<u8> = sas.into();
+            assert_eq!(v.as_slice(), b"test" as &[u8]);
         }
     }
 }

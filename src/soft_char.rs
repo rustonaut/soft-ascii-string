@@ -18,7 +18,7 @@ pub struct SoftAsciiChar(char);
 
 impl SoftAsciiChar {
 
-    #[inline]
+    #[inline(always)]
     pub fn from_char_unchecked(ch: char) -> Self {
         SoftAsciiChar(ch)
     }

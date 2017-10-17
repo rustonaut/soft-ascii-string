@@ -44,7 +44,7 @@ pub struct SoftAsciiStr(str);
 
 impl SoftAsciiStr {
     
-    #[inline]
+    #[inline(always)]
     pub fn from_str_unchecked(s: &str) -> &SoftAsciiStr {
         unsafe { &*( s as *const str as *const SoftAsciiStr) }
     }
