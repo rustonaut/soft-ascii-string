@@ -1,4 +1,3 @@
-use std::ascii::AsciiExt;
 use std::cmp::PartialEq;
 use std::fmt::{self, Display};
 use std::str;
@@ -95,6 +94,12 @@ impl_wrapping! {
 impl PartialEq<char> for SoftAsciiChar {
     fn eq(&self, other: &char) -> bool {
         self.0 == *other
+    }
+}
+
+impl PartialEq<SoftAsciiChar> for char {
+    fn eq(&self, other: &SoftAsciiChar) -> bool {
+        *self == other.0
     }
 }
 

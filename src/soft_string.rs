@@ -1,4 +1,3 @@
-use std::ascii::AsciiExt;
 use std::borrow::{Cow, Borrow};
 use std::ops::{Deref, AddAssign, Add};
 use std::cmp::PartialEq;
@@ -204,6 +203,12 @@ impl<'a> Add<&'a SoftAsciiStr> for SoftAsciiString {
     }
 }
 
+impl PartialEq<SoftAsciiString> for str {
+    fn eq(&self, other: &SoftAsciiString) -> bool {
+        self == other.as_str()
+    }
+}
+
 impl PartialEq<str> for SoftAsciiString {
     #[inline]
     fn eq(&self, other: &str) -> bool {
@@ -211,10 +216,17 @@ impl PartialEq<str> for SoftAsciiString {
     }
 }
 
+
 impl PartialEq<String> for SoftAsciiString {
     #[inline]
     fn eq(&self, other: &String) -> bool {
         self.as_str() == other.as_str()
+    }
+}
+
+impl PartialEq<SoftAsciiString> for String {
+    fn eq(&self, other: &SoftAsciiString) -> bool {
+        self == other.as_str()
     }
 }
 
@@ -225,10 +237,24 @@ impl<'a> PartialEq<&'a SoftAsciiStr> for SoftAsciiString {
     }
 }
 
+impl<'a> PartialEq<SoftAsciiString> for Cow<'a, str> {
+    #[inline]
+    fn eq(&self, other: &SoftAsciiString) -> bool {
+        other.as_str() == &*self
+    }
+}
+
 impl<'a> PartialEq<Cow<'a, str>> for SoftAsciiString {
     #[inline]
     fn eq(&self, other: &Cow<'a, str>) -> bool {
         self.as_str() == &*other
+    }
+}
+
+impl<'a> PartialEq<SoftAsciiString> for Cow<'a, SoftAsciiStr> {
+    #[inline]
+    fn eq(&self, other: &SoftAsciiString) -> bool {
+        self.as_str() == other.as_str()
     }
 }
 
@@ -456,6 +482,7 @@ impl Into<String> for SoftAsciiString {
 mod tests {
     use std::str;
     use std::borrow::Borrow;
+    use ::SoftAsciiStr;
 
     const SOME_NOT_ASCII: &str = "malformed←";
     const SOME_ASCII: &str = "hy there";
@@ -545,6 +572,17 @@ mod tests {
             let sas = SoftAsciiString::from_string_unchecked("test");
             let v: String = sas.into();
             assert_eq!(v, "test");
+        }
+
+        #[test]
+        fn str_eq_string() {
+            let str = SoftAsciiStr::from_str("hy").unwrap();
+            let string = SoftAsciiString::from_string("hy").unwrap();
+
+            assert_eq!(str, str);
+            assert_eq!(str, string);
+            assert_eq!(string, str);
+            assert_eq!(string, string);
         }
     }
 }

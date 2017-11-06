@@ -1,5 +1,4 @@
-use std::ascii::AsciiExt;
-use std::ops::{ 
+use std::ops::{
     Index,  Range,
     RangeFrom, RangeTo,
     RangeFull,
@@ -271,8 +270,20 @@ impl<'a> PartialEq<SoftAsciiString> for &'a SoftAsciiStr {
     }
 }
 
+impl PartialEq<SoftAsciiStr> for String {
+    fn eq(&self, other: &SoftAsciiStr) -> bool {
+        self.as_str() == other.as_str()
+    }
+}
+
 impl PartialEq<String> for SoftAsciiStr {
     fn eq(&self, other: &String) -> bool {
+        self.as_str() == other.as_str()
+    }
+}
+
+impl<'a> PartialEq<&'a SoftAsciiStr> for String {
+    fn eq(&self, other: &&'a SoftAsciiStr) -> bool {
         self.as_str() == other.as_str()
     }
 }
@@ -283,14 +294,32 @@ impl<'a> PartialEq<String> for &'a SoftAsciiStr {
     }    
 }
 
-impl<'a> PartialEq<str> for SoftAsciiStr {
+impl<'a> PartialEq<SoftAsciiStr> for str {
+    fn eq(&self, other: &SoftAsciiStr) -> bool {
+        self == other.as_str()
+    }
+}
+
+impl PartialEq<str> for SoftAsciiStr {
     fn eq(&self, other: &str) -> bool {
         self.as_str() == other
     } 
 }
 
+impl<'a> PartialEq<SoftAsciiStr> for Cow<'a, SoftAsciiStr> {
+    fn eq(&self, other: &SoftAsciiStr) -> bool {
+        self.as_str() == other.as_str()
+    }
+}
+
 impl<'a> PartialEq<Cow<'a, SoftAsciiStr>> for SoftAsciiStr {
     fn eq(&self, other: &Cow<'a, SoftAsciiStr>) -> bool {
+        self.as_str() == other.as_str()
+    }
+}
+
+impl<'a, 'b> PartialEq<&'b SoftAsciiStr> for Cow<'a, SoftAsciiStr> {
+    fn eq(&self, other: &&'b SoftAsciiStr) -> bool {
         self.as_str() == other.as_str()
     }
 }
@@ -301,18 +330,35 @@ impl<'a, 'b> PartialEq<Cow<'a, SoftAsciiStr>> for &'a SoftAsciiStr {
     }
 }
 
+impl<'a> PartialEq<SoftAsciiStr> for Cow<'a, str> {
+    fn eq(&self, other: &SoftAsciiStr) -> bool {
+        &*self == other.as_str()
+    }
+}
+
 impl<'a> PartialEq<Cow<'a, str>> for SoftAsciiStr {
     fn eq(&self, other: &Cow<'a, str>) -> bool {
         self.as_str() == &*other
     }
 }
 
-impl<'a, 'b> PartialEq<Cow<'a, str>> for &'a SoftAsciiStr {
-    fn eq(&self, other: &Cow<'a, str>) -> bool {
+impl<'a, 'b> PartialEq<&'b SoftAsciiStr> for Cow<'a, str> {
+    fn eq(&self, other: &&'b SoftAsciiStr) -> bool {
+        &*self == other.as_str()
+    }
+}
+
+impl<'a, 'b> PartialEq<Cow<'b, str>> for &'a SoftAsciiStr {
+    fn eq(&self, other: &Cow<'b, str>) -> bool {
         self.as_str() == &*other
     }
 }
 
+impl PartialEq<SoftAsciiStr> for OsString {
+    fn eq(&self, other: &SoftAsciiStr) -> bool {
+        other.as_str().eq(self)
+    }
+}
 
 impl PartialEq<OsString> for SoftAsciiStr {
     fn eq(&self, other: &OsString) -> bool {
@@ -320,6 +366,23 @@ impl PartialEq<OsString> for SoftAsciiStr {
     }
 }
 
+impl<'a> PartialEq<&'a SoftAsciiStr> for OsString {
+    fn eq(&self, other: &&'a SoftAsciiStr) -> bool {
+        other.as_str().eq(self)
+    }
+}
+
+impl<'a> PartialEq<OsString> for &'a SoftAsciiStr {
+    fn eq(&self, other: &OsString) -> bool {
+        self.as_str().eq(other)
+    }
+}
+
+impl PartialEq<SoftAsciiStr> for OsStr {
+    fn eq(&self, other: &SoftAsciiStr) -> bool {
+        other.as_str().eq(self)
+    }
+}
 impl PartialEq<OsStr> for SoftAsciiStr {
     fn eq(&self, other: &OsStr) -> bool {
         self.as_str().eq(other)
