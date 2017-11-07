@@ -26,9 +26,9 @@ pub use self::soft_string::*;
 mod macros;
 
 mod soft_char;
-//note while they are seperated for redabilitye str/string
+// note while they are separated for readability str/string
 // still do form one unit, i.e. there is a cyclic reference
-// between them str->ToOwned, string->Deref/etc.
+// between SoftAsciiString<->SoftAsciiStr and others
 mod soft_str;
 mod soft_string;
 
@@ -37,5 +37,3 @@ mod soft_string;
 // - IndexMut (returns a &mut SoftAsciiStr)
 // - DerefMut (returns a &mut SoftAsciiStr)
 // - fuzzed test for forwarded method
-
-
