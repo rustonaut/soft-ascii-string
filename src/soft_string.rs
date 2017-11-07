@@ -71,7 +71,7 @@ impl SoftAsciiString {
     }
     
     #[inline]
-    pub fn push_soft_ascii_str(&mut self, other: &SoftAsciiStr) {
+    pub fn push_str(&mut self, other: &SoftAsciiStr) {
         self.0.push_str(other.as_str())
     }
 
@@ -100,7 +100,7 @@ impl SoftAsciiString {
     }
 
     #[inline]
-    pub fn insert_soft_ascii_str(&mut self, idx: usize, string: &SoftAsciiStr) {
+    pub fn insert_str(&mut self, idx: usize, string: &SoftAsciiStr) {
         self.0.insert_str(idx, string.as_str())
     }
 
@@ -196,14 +196,14 @@ impl Deref for SoftAsciiString {
 
 impl<'a> AddAssign<&'a SoftAsciiStr> for SoftAsciiString {
     fn add_assign(&mut self,  other: &'a SoftAsciiStr) {
-        self.push_soft_ascii_str(other)
+        self.push_str(other)
     }
 }
 impl<'a> Add<&'a SoftAsciiStr> for SoftAsciiString {
     type Output = Self;
 
     fn add(mut self, other: &'a SoftAsciiStr) -> Self {
-        self.push_soft_ascii_str(other);
+        self.push_str(other);
         self
     }
 }
@@ -408,7 +408,7 @@ impl Extend<SoftAsciiString> for SoftAsciiString {
         where I: IntoIterator<Item=SoftAsciiString>
     {
         for string in iter {
-            self.push_soft_ascii_str(&*string);
+            self.push_str(&*string);
         }
     }
 }
@@ -418,7 +418,7 @@ impl<'a> Extend<&'a SoftAsciiStr> for SoftAsciiString {
         where I: IntoIterator<Item=&'a SoftAsciiStr>
     {
         for str in iter {
-            self.push_soft_ascii_str(str);
+            self.push_str(str);
         }
     }
 }
@@ -428,7 +428,7 @@ impl<'a> Extend<Cow<'a, SoftAsciiStr>> for SoftAsciiString {
         where I: IntoIterator<Item=Cow<'a, SoftAsciiStr>>
     {
         for cow in iter {
-            self.push_soft_ascii_str(&cow)
+            self.push_str(&cow)
         }
     }
 }
