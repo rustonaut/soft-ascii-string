@@ -6,6 +6,11 @@ use std::char::{
     ToUppercase, ToLowercase, 
     EscapeDebug, EscapeDefault, EscapeUnicode
 };
+// this import will become unused in future rust versions
+// but won't be removed for now for supporting current
+// rust versions
+#[allow(warnings)]
+use std::ascii::AsciiExt;
 
 ///a `char` wrapper with a "is us-ascii" soft constraint
 #[derive(

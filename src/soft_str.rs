@@ -13,6 +13,11 @@ use std::net::{ToSocketAddrs, SocketAddr};
 use std::str::{self, FromStr, EncodeUtf16};
 use std::{vec, io};
 use std::iter::{Iterator, DoubleEndedIterator};
+// this import will become unused in future rust versions
+// but won't be removed for now for supporting current
+// rust versions
+#[allow(warnings)]
+use std::ascii::AsciiExt;
 
 use super::SoftAsciiChar;
 use super::SoftAsciiString;

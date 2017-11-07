@@ -12,6 +12,11 @@ use std::ffi::OsStr;
 use std::net::{ToSocketAddrs, SocketAddr};
 use std::fmt::{self, Display};
 use std::{io, vec};
+// this import will become unused in future rust versions
+// but won't be removed for now for supporting current
+// rust versions
+#[allow(warnings)]
+use std::ascii::AsciiExt;
 
 use super::SoftAsciiChar;
 use super::SoftAsciiStr;
