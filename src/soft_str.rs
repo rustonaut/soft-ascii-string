@@ -54,6 +54,11 @@ impl SoftAsciiStr {
         unsafe { &*( s as *const str as *const SoftAsciiStr) }
     }
 
+    #[inline(always)]
+    pub fn from_str_unchecked_mut(s: &mut str) -> &mut SoftAsciiStr {
+        unsafe { &mut *( s as *mut str as *mut SoftAsciiStr) }
+    }
+
     pub fn from_str(source: &str) -> Result<&Self, FromSourceError<&str>> {
         if source.is_ascii() {
             Ok(Self::from_str_unchecked(source))

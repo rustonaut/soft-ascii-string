@@ -1,11 +1,11 @@
 use std::borrow::{Cow, Borrow};
-use std::ops::{Deref, AddAssign, Add};
+use std::ops::{Deref, DerefMut, AddAssign, Add};
 use std::cmp::PartialEq;
 use std::iter::{IntoIterator, FromIterator, Extend};
 use std::ops::{ 
-    Index,  Range,
-    RangeFrom, RangeTo,
-    RangeFull,
+    Index, IndexMut,
+    Range, RangeFrom,
+    RangeTo, RangeFull,
 };
 use std::path::Path;
 use std::ffi::OsStr;
@@ -115,6 +115,11 @@ impl SoftAsciiString {
     }
 
     #[inline]
+    pub fn as_soft_ascii_str_mut(&mut self) -> &mut SoftAsciiStr {
+        SoftAsciiStr::from_str_unchecked_mut(self.0.as_mut_str())
+    }
+
+    #[inline]
     pub fn split_off(&mut self, at: usize) -> SoftAsciiString {
         SoftAsciiString::from_string_unchecked(self.0.split_off(at))
     }
@@ -195,6 +200,13 @@ impl Deref for SoftAsciiString {
     #[inline]
     fn deref(&self) -> &Self::Target {
         self.as_soft_ascii_str()
+    }
+}
+
+impl DerefMut for SoftAsciiString {
+    #[inline]
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        self.as_soft_ascii_str_mut()
     }
 }
 
@@ -393,6 +405,23 @@ macro_rules! impl_index {
 }
 
 impl_index! {
+    Range<usize>,
+    RangeFrom<usize>,
+    RangeTo<usize>,
+    RangeFull
+}
+
+macro_rules! impl_index_mut {
+    ($($idx:ty),*) => ($(
+        impl IndexMut<$idx> for SoftAsciiString {
+            fn index_mut(&mut self, index: $idx) -> &mut Self::Output {
+                SoftAsciiStr::from_str_unchecked_mut(self.0.index_mut(index))
+            }
+        }
+    )*);
+}
+
+impl_index_mut! {
     Range<usize>,
     RangeFrom<usize>,
     RangeTo<usize>,
