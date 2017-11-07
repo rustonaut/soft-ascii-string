@@ -1,0 +1,12 @@
+sudo: false
+
+language: rust
+cache: cargo
+rust:
+  - stable
+  - beta
+  - nightly
+matrix:
+  fast_finish: true
+  allow_failures:
+    - rust: nightly
