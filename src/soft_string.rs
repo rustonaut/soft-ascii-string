@@ -13,7 +13,6 @@ use std::net::{ToSocketAddrs, SocketAddr};
 use std::fmt::{self, Display};
 use std::{io, vec};
 use std::str::FromStr;
-use std::error::Error;
 
 // this import will become unused in future rust versions
 // but won't be removed for now for supporting current
@@ -21,8 +20,9 @@ use std::error::Error;
 #[allow(warnings)]
 use std::ascii::AsciiExt;
 
-use super::SoftAsciiChar;
-use super::SoftAsciiStr;
+use error::StringFromStrError;
+use soft_char::SoftAsciiChar;
+use soft_str::SoftAsciiStr;
 
 /// a `String` wrapper with an additional "is us-ascii" soft constraint
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
@@ -496,20 +496,6 @@ impl Into<String> for SoftAsciiString {
     }
 }
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
-pub struct StringFromStrError;
-impl Error for StringFromStrError {
-    fn description(&self) -> &str {
-        "&str does contain non us-ascii chars and can not be converted to a SoftAsciiString"
-    }
-}
-
-impl fmt::Display for StringFromStrError {
-    fn fmt(&self, fter: &mut fmt::Formatter) -> fmt::Result {
-        write!(fter, "{}", self.description())
-    }
-}
-
 impl FromStr for SoftAsciiString {
     type Err = StringFromStrError;
 
@@ -631,7 +617,6 @@ mod tests {
 
         #[test]
         fn from_str() {
-            use super::super::StringFromStrError;
             use std::str::FromStr;
             let s: SoftAsciiString = assert_ok!(FromStr::from_str("hy ho"));
             assert_eq!(s, "hy ho");
