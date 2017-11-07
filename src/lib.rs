@@ -33,8 +33,6 @@ mod soft_char;
 mod soft_str;
 mod soft_string;
 
-//TODO:
-// - FromStr with custom error
 // - IndexMut (returns a &mut SoftAsciiStr)
 // - DerefMut (returns a &mut SoftAsciiStr)
 // - fuzzed test for forwarded method

@@ -20,7 +20,7 @@ use std::str::FromStr;
 #[allow(warnings)]
 use std::ascii::AsciiExt;
 
-use error::StringFromStrError;
+use error::{StringFromStrError, FromSourceError};
 use soft_char::SoftAsciiChar;
 use soft_str::SoftAsciiStr;
 
@@ -35,11 +35,13 @@ impl SoftAsciiString {
         SoftAsciiString(s.into())
     }
 
-    pub fn from_string<S: AsRef<str>+Into<String>>(s: S) -> Result<Self, S> {
-        if s.as_ref().is_ascii() {
-            Ok(Self::from_string_unchecked(s))
+    pub fn from_string<S>(source: S) -> Result<Self, FromSourceError<S>>
+        where S: fmt::Debug + AsRef<str> + Into<String>
+    {
+        if source.as_ref().is_ascii() {
+            Ok(Self::from_string_unchecked(source))
         } else {
-            Err(s)
+            Err(FromSourceError { source })
         }
     }
 
@@ -540,7 +542,8 @@ mod tests {
             assert_eq!(&*sas, SOME_ASCII);
                         let sas: SoftAsciiString = assert_ok!(SoftAsciiString::from_string(SOME_ASCII.to_owned()));
             assert_eq!(&*sas, SOME_ASCII);
-            let failed: String = assert_err!(SoftAsciiString::from_string(SOME_NOT_ASCII.to_owned()));
+            let failed: String =
+                assert_err!(SoftAsciiString::from_string(SOME_NOT_ASCII.to_owned())).into_source();
             assert_eq!(&*failed, SOME_NOT_ASCII);
         }
 

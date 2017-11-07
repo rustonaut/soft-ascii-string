@@ -19,8 +19,9 @@ use std::iter::{Iterator, DoubleEndedIterator};
 #[allow(warnings)]
 use std::ascii::AsciiExt;
 
-use super::SoftAsciiChar;
-use super::SoftAsciiString;
+use error::FromSourceError;
+use soft_char::SoftAsciiChar;
+use soft_string::SoftAsciiString;
 
 /// A `str` wrapper adding a "is us-ascii" soft constraint.
 ///
@@ -53,20 +54,20 @@ impl SoftAsciiStr {
         unsafe { &*( s as *const str as *const SoftAsciiStr) }
     }
 
-    pub fn from_str(s: &str) -> Result<&Self, &str> {
-        if s.is_ascii() {
-            Ok(Self::from_str_unchecked(s))
+    pub fn from_str(source: &str) -> Result<&Self, FromSourceError<&str>> {
+        if source.is_ascii() {
+            Ok(Self::from_str_unchecked(source))
         } else {
-            Err(s)
+            Err(FromSourceError { source })
         }
     }
 
     /// reruns checks if the "is us-ascii" soft constraint is still valid
-    pub fn revalidate_soft_constraint(&self) -> Result<&Self, &str> {
+    pub fn revalidate_soft_constraint(&self) -> Result<&Self, FromSourceError<&str>> {
         if self.is_ascii() {
             Ok(self)
         } else {
-            Err(self.as_str())
+            Err(FromSourceError{ source: self.as_str() })
         }
     }
 
@@ -622,7 +623,7 @@ mod test {
         #[test]
         fn revalidate_soft_constraint() {
             let res = SoftAsciiStr::from_str_unchecked(UTF8_STR).revalidate_soft_constraint();
-            assert_eq!(UTF8_STR, assert_err!(res));
+            assert_eq!(UTF8_STR, assert_err!(res).into_source());
 
             let res = SoftAsciiStr::from_str_unchecked("hy").revalidate_soft_constraint();
             let res: &SoftAsciiStr = assert_ok!(res);
