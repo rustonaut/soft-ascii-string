@@ -25,7 +25,7 @@ pub use self::soft_string::*;
 #[macro_use]
 mod macros;
 
-mod error;
+pub mod error;
 mod soft_char;
 // note while they are separated for readability str/string
 // still do form one unit, i.e. there is a cyclic reference
