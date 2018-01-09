@@ -41,7 +41,7 @@ impl SoftAsciiString {
         if source.as_ref().is_ascii() {
             Ok(Self::from_string_unchecked(source))
         } else {
-            Err(FromSourceError { source })
+            Err(FromSourceError::new(source))
         }
     }
 

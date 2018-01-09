@@ -6,11 +6,11 @@ use std::char::{
     ToUppercase, ToLowercase, 
     EscapeDebug, EscapeDefault, EscapeUnicode
 };
-// this import will become unused in future rust versions
-// but won't be removed for now for supporting current
-// rust versions
-#[allow(warnings)]
+#[allow(unused_imports)]
 use std::ascii::AsciiExt;
+
+use error::FromSourceError;
+
 
 ///a `char` wrapper with a "is us-ascii" soft constraint
 #[derive(
@@ -27,11 +27,11 @@ impl SoftAsciiChar {
         SoftAsciiChar(ch)
     }
 
-    pub fn from_char(ch: char) -> Result<Self, char> {
+    pub fn from_char(ch: char) -> Result<Self, FromSourceError<char>> {
         if ch.is_ascii() {
             Ok(SoftAsciiChar(ch))
         } else {
-            Err(ch)
+            Err(FromSourceError::new(ch))
         }
     }
 
@@ -116,13 +116,14 @@ mod test {
     mod SoftAsciiChar {
         #![allow(non_snake_case)]
         use super::super::SoftAsciiChar;
+        use error::FromSourceError;
 
         #[test]
         fn from_char() {
             let res: SoftAsciiChar = assert_ok!(SoftAsciiChar::from_char('a'));
             assert_eq!(res, 'a');
-            let res: char = assert_err!(SoftAsciiChar::from_char('↓'));
-            assert_eq!(res, '↓');
+            let res = assert_err!(SoftAsciiChar::from_char('↓'));
+            assert_eq!(res, FromSourceError::new('↓'));
         }
 
         #[test]

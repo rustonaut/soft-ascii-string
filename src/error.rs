@@ -18,13 +18,19 @@ impl fmt::Display for StringFromStrError {
 
 /// Error returned if creating a SoftAsciiStr/SoftAsciiString failed
 #[derive(Debug, PartialEq, Eq, Clone, Hash)]
-pub struct FromSourceError<S: Debug+AsRef<str>> {
-    pub(crate) source: S
+pub struct FromSourceError<S: Debug> {
+    source: S
 }
 
 impl<S> FromSourceError<S>
-    where S: Debug + AsRef<str>
+    where S: Debug
 {
+
+    /// creates a new FromSourceError
+    pub fn new(source: S) -> Self {
+        FromSourceError { source }
+    }
+
     /// returns a reference to the source
     ///
     /// the source is the input which was meant to be converted into a
@@ -33,13 +39,6 @@ impl<S> FromSourceError<S>
         &self.source
     }
 
-    /// returns a str representation of the source
-    ///
-    /// the source is the input which was meant to be converted into a
-    /// SoftAsciiStr/String
-    pub fn source_str(&self) -> &str {
-        self.source.as_ref()
-    }
 
     // Note that Into, can not be implemented due to possible conflicting
     // implementations
@@ -55,7 +54,7 @@ impl<S> FromSourceError<S>
 
 
 impl<S> Error for FromSourceError<S>
-    where S: Debug+AsRef<str>
+    where S: Debug
 {
     fn description(&self) -> &str {
         concat!("could not create a SoftAscii representation of the source",
@@ -64,9 +63,9 @@ impl<S> Error for FromSourceError<S>
 }
 
 impl<S> fmt::Display for FromSourceError<S>
-    where S: Debug+AsRef<str>
+    where S: Debug
 {
     fn fmt(&self, fter: &mut fmt::Formatter) -> fmt::Result {
-        write!(fter, "source contains non us-ascii chars: {:?}", self.source.as_ref())
+        write!(fter, "source contains non us-ascii chars: {:?}", self.source)
     }
 }

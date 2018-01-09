@@ -63,7 +63,7 @@ impl SoftAsciiStr {
         if source.is_ascii() {
             Ok(Self::from_str_unchecked(source))
         } else {
-            Err(FromSourceError { source })
+            Err(FromSourceError::new(source))
         }
     }
 
@@ -72,7 +72,7 @@ impl SoftAsciiStr {
         if self.is_ascii() {
             Ok(self)
         } else {
-            Err(FromSourceError{ source: self.as_str() })
+            Err(FromSourceError::new(self.as_str()))
         }
     }
 
