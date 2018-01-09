@@ -24,6 +24,8 @@ This crate is not necessarily suited if you want to rally on the string
 being ascii on a safety level, you might want to consider using
 [ascii](https://crates.io/crates/ascii) in that case.
 
+Documentation can be [viewed on docs.rs](https://docs.rs/soft-ascii-string).
+
 ## Example
 
 ```rust
@@ -103,10 +105,28 @@ mod external {
     }
 
 }
-
 ```
 
-Documentation can be [viewed on docs.rs](https://docs.rs/soft-ascii-string).
+Error handling:
+
+```rust
+extern crate soft_ascii_string;
+
+use soft_ascii_string::{SoftAsciiChar, SoftAsciiStr, SoftAsciiString};
+
+fn main() {
+    let non_ascii_input: String = "←↓↓↓".into();
+    match SoftAsciiString::from_string(non_ascii_input) {
+        Ok(okvalue) => panic!("the string should not have been ascii"),
+        Err(err) => {
+            let original_source: String = err.into_source();
+            println!("the input was: {:?}", original_source)
+        }
+    }
+}
+```
+
+
 
 
 ## License
