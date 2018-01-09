@@ -1,6 +1,7 @@
 use std::fmt::{self, Debug};
 use std::error::Error;
 
+/// Error returned if FromStr failed
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub struct StringFromStrError;
 impl Error for StringFromStrError {
@@ -15,7 +16,7 @@ impl fmt::Display for StringFromStrError {
     }
 }
 
-
+/// Error returned if creating a SoftAsciiStr/SoftAsciiString failed
 #[derive(Debug, PartialEq, Eq, Clone, Hash)]
 pub struct FromSourceError<S: Debug+AsRef<str>> {
     pub(crate) source: S
