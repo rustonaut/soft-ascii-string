@@ -2,7 +2,7 @@ use std::borrow::{Cow, Borrow};
 use std::ops::{Deref, DerefMut, AddAssign, Add};
 use std::cmp::PartialEq;
 use std::iter::{IntoIterator, FromIterator, Extend};
-use std::ops::{ 
+use std::ops::{
     Index, IndexMut,
     Range, RangeFrom,
     RangeTo, RangeFull,
@@ -31,15 +31,21 @@ pub struct SoftAsciiString(String);
 impl SoftAsciiString {
 
     #[inline(always)]
-    pub fn from_string_unchecked<S: Into<String>>(s: S) -> Self {
+    pub fn from_unchecked<S: Into<String>>(s: S) -> Self {
         SoftAsciiString(s.into())
+    }
+
+    #[inline(always)]
+    #[deprecated(since="1.0.0", note="use from_unchecked")]
+    pub fn from_string_unchecked<S: Into<String>>(s: S) -> Self {
+        SoftAsciiString::from_unchecked(s)
     }
 
     pub fn from_string<S>(source: S) -> Result<Self, FromSourceError<S>>
         where S: fmt::Debug + AsRef<str> + Into<String>
     {
         if source.as_ref().is_ascii() {
-            Ok(Self::from_string_unchecked(source))
+            Ok(Self::from_unchecked(source))
         } else {
             Err(FromSourceError::new(source))
         }
@@ -74,7 +80,7 @@ impl SoftAsciiString {
     pub fn inner_string(&self) -> &String {
         &self.0
     }
-    
+
     #[inline]
     pub fn push_str(&mut self, other: &SoftAsciiStr) {
         self.0.push_str(other.as_str())
@@ -92,11 +98,11 @@ impl SoftAsciiString {
 
     pub fn pop(&mut self) -> Option<SoftAsciiChar> {
         self.0.pop()
-            .map(SoftAsciiChar::from_char_unchecked)
+            .map(SoftAsciiChar::from_unchecked)
     }
-    
+
     pub fn remove(&mut self, idx: usize) -> SoftAsciiChar {
-        SoftAsciiChar::from_char_unchecked(self.0.remove(idx))
+        SoftAsciiChar::from_unchecked(self.0.remove(idx))
     }
 
     #[inline]
@@ -111,17 +117,17 @@ impl SoftAsciiString {
 
     #[inline]
     pub fn as_soft_ascii_str(&self) -> &SoftAsciiStr {
-        SoftAsciiStr::from_str_unchecked(self.0.as_str())
+        SoftAsciiStr::from_unchecked(self.0.as_str())
     }
 
     #[inline]
     pub fn as_soft_ascii_str_mut(&mut self) -> &mut SoftAsciiStr {
-        SoftAsciiStr::from_str_unchecked_mut(self.0.as_mut_str())
+        SoftAsciiStr::from_unchecked_mut(self.0.as_mut_str())
     }
 
     #[inline]
     pub fn split_off(&mut self, at: usize) -> SoftAsciiString {
-        SoftAsciiString::from_string_unchecked(self.0.split_off(at))
+        SoftAsciiString::from_unchecked(self.0.split_off(at))
     }
 
     #[inline]
@@ -138,7 +144,7 @@ impl SoftAsciiString {
     pub fn is_ascii(&self) -> bool {
         self.0.is_ascii()
     }
-    
+
 }
 
 macro_rules! impl_wrapping {
@@ -398,7 +404,7 @@ macro_rules! impl_index {
         impl Index<$idx> for SoftAsciiString {
             type Output = SoftAsciiStr;
             fn index(&self, index: $idx) -> &Self::Output {
-                SoftAsciiStr::from_str_unchecked(self.0.index(index))
+                SoftAsciiStr::from_unchecked(self.0.index(index))
             }
         }
     )*);
@@ -415,7 +421,7 @@ macro_rules! impl_index_mut {
     ($($idx:ty),*) => ($(
         impl IndexMut<$idx> for SoftAsciiString {
             fn index_mut(&mut self, index: $idx) -> &mut Self::Output {
-                SoftAsciiStr::from_str_unchecked_mut(self.0.index_mut(index))
+                SoftAsciiStr::from_unchecked_mut(self.0.index_mut(index))
             }
         }
     )*);
@@ -551,17 +557,17 @@ mod tests {
     //FIXME use impl Trait instead
     fn borrow_untyped<T: ?Sized, B: Borrow<T>>(b: &B) -> &B { b }
     fn as_ref_untype<T: ?Sized, B: AsRef<T>>(b: &B) -> &B { b }
-    
+
     mod SoftAsciiString {
         #![allow(non_snake_case)]
         use super::*;
         use super::super::SoftAsciiString;
 
         #[test]
-        fn from_string_unchecked() {
-            let sas = SoftAsciiString::from_string_unchecked(SOME_ASCII);
+        fn from_unchecked() {
+            let sas = SoftAsciiString::from_unchecked(SOME_ASCII);
             assert_eq!(&*sas, SOME_ASCII);
-            let sas = SoftAsciiString::from_string_unchecked(SOME_NOT_ASCII);
+            let sas = SoftAsciiString::from_unchecked(SOME_NOT_ASCII);
             assert_eq!(&*sas, SOME_NOT_ASCII);
         }
 
@@ -613,25 +619,25 @@ mod tests {
 
         #[test]
         fn revalidate_soft_constraint() {
-            let sas: SoftAsciiString = 
-                SoftAsciiString::from_string_unchecked(SOME_ASCII);
+            let sas: SoftAsciiString =
+                SoftAsciiString::from_unchecked(SOME_ASCII);
             assert_ok!(sas.revalidate_soft_constraint());
 
             let bad: SoftAsciiString =
-                SoftAsciiString::from_string_unchecked(SOME_NOT_ASCII);
+                SoftAsciiString::from_unchecked(SOME_NOT_ASCII);
             assert_err!(bad.revalidate_soft_constraint());
         }
 
         #[test]
         fn has_into_vec_u8() {
-            let sas = SoftAsciiString::from_string_unchecked("test");
+            let sas = SoftAsciiString::from_unchecked("test");
             let v: Vec<u8> = sas.into();
             assert_eq!(v.as_slice(), b"test" as &[u8]);
         }
 
         #[test]
         fn has_into_string() {
-            let sas = SoftAsciiString::from_string_unchecked("test");
+            let sas = SoftAsciiString::from_unchecked("test");
             let v: String = sas.into();
             assert_eq!(v, "test");
         }

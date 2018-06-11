@@ -23,8 +23,14 @@ pub struct SoftAsciiChar(char);
 impl SoftAsciiChar {
 
     #[inline(always)]
-    pub fn from_char_unchecked(ch: char) -> Self {
+    pub fn from_unchecked(ch: char) -> Self {
         SoftAsciiChar(ch)
+    }
+
+    #[inline(always)]
+    #[deprecated(since="1.0.0", note="use from_unchecked")]
+    pub fn from_char_unchecked(ch: char) -> Self {
+        SoftAsciiChar::from_unchecked(ch)
     }
 
     pub fn from_char(ch: char) -> Result<Self, FromSourceError<char>> {
@@ -127,19 +133,19 @@ mod test {
         }
 
         #[test]
-        fn from_char_unchecked() {
-            let a: SoftAsciiChar = SoftAsciiChar::from_char_unchecked('a');
+        fn from_unchecked() {
+            let a: SoftAsciiChar = SoftAsciiChar::from_unchecked('a');
             assert_eq!(a, 'a');
-            let a: SoftAsciiChar = SoftAsciiChar::from_char_unchecked('↓');
+            let a: SoftAsciiChar = SoftAsciiChar::from_unchecked('↓');
             assert_eq!(a, '↓');
         }
 
         #[test]
         fn revalidate_soft_constraint() {
-            let a: SoftAsciiChar = SoftAsciiChar::from_char_unchecked('a');
+            let a: SoftAsciiChar = SoftAsciiChar::from_unchecked('a');
             let val = assert_ok!(a.revalidate_soft_constraint());
             assert_eq!(val, 'a');
-            let a: SoftAsciiChar = SoftAsciiChar::from_char_unchecked('↓');
+            let a: SoftAsciiChar = SoftAsciiChar::from_unchecked('↓');
             let val = assert_err!(a.revalidate_soft_constraint());
             assert_eq!(val, '↓');
         }

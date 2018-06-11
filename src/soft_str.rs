@@ -50,18 +50,24 @@ pub struct SoftAsciiStr(str);
 impl SoftAsciiStr {
 
     #[inline(always)]
-    pub fn from_str_unchecked(s: &str) -> &SoftAsciiStr {
+    pub fn from_unchecked(s: &str) -> &SoftAsciiStr {
         unsafe { &*( s as *const str as *const SoftAsciiStr) }
     }
 
     #[inline(always)]
-    pub fn from_str_unchecked_mut(s: &mut str) -> &mut SoftAsciiStr {
+    #[deprecated(since = "1.0.0", note="use from_unchecked")]
+    pub fn from_str_unchecked(s: &str) -> &SoftAsciiStr {
+        SoftAsciiStr::from_unchecked(s)
+    }
+
+    #[inline(always)]
+    pub fn from_unchecked_mut(s: &mut str) -> &mut SoftAsciiStr {
         unsafe { &mut *( s as *mut str as *mut SoftAsciiStr) }
     }
 
     pub fn from_str(source: &str) -> Result<&Self, FromSourceError<&str>> {
         if source.is_ascii() {
-            Ok(Self::from_str_unchecked(source))
+            Ok(Self::from_unchecked(source))
         } else {
             Err(FromSourceError::new(source))
         }
@@ -86,7 +92,7 @@ impl SoftAsciiStr {
         //Safe: basicaly coerces Box<SoftAsciiStr> to Box<str>
         let as_str = Self::into_boxed_str(self);
         let string = str::into_string(as_str);
-        SoftAsciiString::from_string_unchecked(string)
+        SoftAsciiString::from_unchecked(string)
     }
 
     pub fn from_boxed_str(bs: Box<str>) -> Box<SoftAsciiStr> {
@@ -120,11 +126,11 @@ impl SoftAsciiStr {
 
     pub fn split_at(&self, mid: usize) -> (&SoftAsciiStr, &SoftAsciiStr) {
         let (left, right) = self.as_str().split_at(mid);
-        (SoftAsciiStr::from_str_unchecked(left), SoftAsciiStr::from_str_unchecked(right))
+        (SoftAsciiStr::from_unchecked(left), SoftAsciiStr::from_unchecked(right))
     }
 
     pub unsafe fn slice_unchecked(&self, begin: usize, end: usize) -> &SoftAsciiStr {
-        SoftAsciiStr::from_str_unchecked(self.as_str().slice_unchecked(begin, end))
+        SoftAsciiStr::from_unchecked(self.as_str().slice_unchecked(begin, end))
     }
 
     /// returns a mutable `str` reference to the inner buffer
@@ -155,7 +161,7 @@ macro_rules! impl_wrap_returning_string {
             pub fn $name(&self $(, $param: $tp)*) -> SoftAsciiString {
                 let as_str = self.as_str();
                 let res = str::$name(as_str $(, $param)*);
-                SoftAsciiString::from_string_unchecked(res)
+                SoftAsciiString::from_unchecked(res)
             }
         }
     )*)
@@ -175,7 +181,7 @@ macro_rules! impl_wrap_returning_str {
             pub fn $name(&self $(, $param: $tp)*) -> &SoftAsciiStr {
                 let as_str = self.as_str();
                 let res = str::$name(as_str $(, $param)*);
-                SoftAsciiStr::from_str_unchecked(res)
+                SoftAsciiStr::from_unchecked(res)
             }
         )*}
     );
@@ -233,7 +239,7 @@ impl AsRef<[u8]> for SoftAsciiStr {
 impl<'a> Default for &'a SoftAsciiStr {
     #[inline]
     fn default() -> &'a SoftAsciiStr {
-        SoftAsciiStr::from_str_unchecked(Default::default())
+        SoftAsciiStr::from_unchecked(Default::default())
     }
 }
 
@@ -248,7 +254,7 @@ macro_rules! impl_index {
         impl Index<$idx> for SoftAsciiStr {
             type Output = SoftAsciiStr;
             fn index(&self, index: $idx) -> &Self::Output {
-                SoftAsciiStr::from_str_unchecked(self.0.index(index))
+                SoftAsciiStr::from_unchecked(self.0.index(index))
             }
         }
     )*);
@@ -265,7 +271,7 @@ impl ToOwned for SoftAsciiStr {
     type Owned = SoftAsciiString;
 
     fn to_owned(&self) -> SoftAsciiString {
-        SoftAsciiString::from_string_unchecked(String::from(&self.0))
+        SoftAsciiString::from_unchecked(String::from(&self.0))
     }
 }
 
@@ -442,7 +448,7 @@ impl<'a> Iterator for SoftAsciiChars<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         self.inner.next()
-            .map(SoftAsciiChar::from_char_unchecked)
+            .map(SoftAsciiChar::from_unchecked)
 
     }
 
@@ -458,14 +464,14 @@ impl<'a> Iterator for SoftAsciiChars<'a> {
 
     fn last(self) -> Option<Self::Item> {
         self.inner.last()
-            .map(SoftAsciiChar::from_char_unchecked)
+            .map(SoftAsciiChar::from_unchecked)
     }
 }
 
 impl<'a> DoubleEndedIterator for SoftAsciiChars<'a> {
     fn next_back(&mut self) -> Option<Self::Item> {
         self.inner.next_back()
-            .map(SoftAsciiChar::from_char_unchecked)
+            .map(SoftAsciiChar::from_unchecked)
     }
 }
 
@@ -492,7 +498,7 @@ impl<'a> Iterator for SoftAsciiCharIndices<'a> {
     fn next(&mut self) -> Option<Self::Item> {
         self.inner.next()
             .map(|(idx, ch)| {
-                (idx, SoftAsciiChar::from_char_unchecked(ch))
+                (idx, SoftAsciiChar::from_unchecked(ch))
             })
     }
 
@@ -509,7 +515,7 @@ impl<'a> Iterator for SoftAsciiCharIndices<'a> {
     fn last(self) -> Option<Self::Item> {
         self.inner.last()
             .map(|(idx, ch)| {
-                (idx, SoftAsciiChar::from_char_unchecked(ch))
+                (idx, SoftAsciiChar::from_unchecked(ch))
             })
     }
 }
@@ -518,7 +524,7 @@ impl<'a> DoubleEndedIterator for SoftAsciiCharIndices<'a> {
     fn next_back(&mut self) -> Option<Self::Item> {
         self.inner.next_back()
             .map(|(idx, ch)| {
-                (idx, SoftAsciiChar::from_char_unchecked(ch))
+                (idx, SoftAsciiChar::from_unchecked(ch))
             })
     }
 }
@@ -545,7 +551,7 @@ impl<'a> Iterator for SoftAsciiLines<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         self.inner.next()
-            .map(SoftAsciiStr::from_str_unchecked)
+            .map(SoftAsciiStr::from_unchecked)
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
@@ -557,7 +563,7 @@ impl<'a> Iterator for SoftAsciiLines<'a> {
 impl<'a> DoubleEndedIterator for SoftAsciiLines<'a> {
     fn next_back(&mut self) -> Option<Self::Item> {
         self.inner.next_back()
-            .map(SoftAsciiStr::from_str_unchecked)
+            .map(SoftAsciiStr::from_unchecked)
     }
 }
 
@@ -584,14 +590,14 @@ impl<'a> Iterator for SoftAsciiSplitWhitespace<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         self.inner.next()
-            .map(SoftAsciiStr::from_str_unchecked)
+            .map(SoftAsciiStr::from_unchecked)
     }
 }
 
 impl<'a> DoubleEndedIterator for SoftAsciiSplitWhitespace<'a> {
     fn next_back(&mut self) -> Option<Self::Item> {
         self.inner.next_back()
-            .map(SoftAsciiStr::from_str_unchecked)
+            .map(SoftAsciiStr::from_unchecked)
     }
 }
 
@@ -618,19 +624,19 @@ mod test {
         }
 
         #[test]
-        fn from_str_unchecked() {
+        fn from_unchecked() {
             assert_eq!(
-                SoftAsciiStr::from_str_unchecked(UTF8_STR),
+                SoftAsciiStr::from_unchecked(UTF8_STR),
                 UTF8_STR
             );
         }
 
         #[test]
         fn revalidate_soft_constraint() {
-            let res = SoftAsciiStr::from_str_unchecked(UTF8_STR).revalidate_soft_constraint();
+            let res = SoftAsciiStr::from_unchecked(UTF8_STR).revalidate_soft_constraint();
             assert_eq!(UTF8_STR, assert_err!(res).into_source());
 
-            let res = SoftAsciiStr::from_str_unchecked("hy").revalidate_soft_constraint();
+            let res = SoftAsciiStr::from_unchecked("hy").revalidate_soft_constraint();
             let res: &SoftAsciiStr = assert_ok!(res);
             assert_eq!(
                 res,

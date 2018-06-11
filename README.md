@@ -34,16 +34,17 @@ fn main() {
     // encoder_stub should encode all non-ascii chars
     // but it's a complex external dependency so we do
     // not want to rely on it on a safety level
-    let mut ascii = SoftAsciiString::from_string_unchecked(external::encoder_stub("magic↓"));
+    let mut ascii = SoftAsciiString::from_unchecked(external::encoder_stub("magic↓"));
 
     // we know ":" is ascii so no unnecessary checks here
-    ascii.push(SoftAsciiChar::from_char_unchecked(':'));
+    ascii.push(SoftAsciiChar::from_unchecked(':'));
     // we know "abcde" is ascii so no unnecessary checks here
-    ascii.push_str(SoftAsciiStr::from_str_unchecked("abcde"));
+    ascii.push_str(SoftAsciiStr::from_unchecked("abcde"));
 
     // lets assume we got this from somewhere
     let other_input = "other string";
-    let part = SoftAsciiStr::from_str(other_input).expect("other_input should have been ascii");
+    let part = SoftAsciiStr::from_str(other_input)
+        .expect("other_input should have been ascii");
     ascii.push_str(part);
 
     let mut clone = SoftAsciiString::with_capacity(ascii.len());
