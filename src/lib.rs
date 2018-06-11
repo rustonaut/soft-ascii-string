@@ -5,7 +5,7 @@
 //! is (normally) a bug it _does not_ introduce any safety issues.
 //! In this soft-ascii-string differs to e.g. [ascii](https://crates.io/crates/ascii)
 //! which uses a hard constraint and where a violation does brake
-//! rust safety and potentially introduces undefined behaviour.
+//! rust safety and potentially introduces undefined behavior.
 //!
 //! Soft-ascii-string is suited for situations where many places
 //! (e.g. external libraries) output strings which should be

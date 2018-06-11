@@ -1,9 +1,5 @@
-
-# soft-ascii-string &emsp; [![Build Status](https://travis-ci.org/1aim/soft_ascii_string.svg?branch=master)](https://travis-ci.org/1aim/soft_ascii_string)
-
-**char/str/string wrappers which add a "is-ascii" soft constraint**
-
----
+soft-ascii-string [![Crates.io](https://img.shields.io/crates/v/soft-ascii-string.svg)](https://crates.io/crates/soft-ascii-string) [![soft-ascii-string](https://docs.rs/soft-ascii-string/badge.svg)](https://docs.rs/soft-ascii-string) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+=============
 
 soft-ascii-string provides char, str and string wrapper which
 add an "is-ascii" soft constraint.
@@ -12,7 +8,7 @@ As it is a soft constraint it can be violated, while a violation
 is (normally) a bug it _does not_ introduce any safety issues.
 In this soft-ascii-string differs to e.g. [ascii](https://crates.io/crates/ascii)
 which uses a hard constraint and where a violation does brake
-rust safety and potentially introduces undefined behaviour.
+rust safety and potentially introduces undefined behavior.
 
 Soft-ascii-string is suited for situations where many places
 (e.g. external libraries) output strings which should be
@@ -26,7 +22,8 @@ being ascii on a safety level, you might want to consider using
 
 Documentation can be [viewed on docs.rs](https://docs.rs/soft-ascii-string).
 
-## Example
+Example
+-------
 
 ```rust
 extern crate soft_ascii_string;
@@ -117,7 +114,7 @@ use soft_ascii_string::{SoftAsciiChar, SoftAsciiStr, SoftAsciiString};
 fn main() {
     let non_ascii_input: String = "←↓↓↓".into();
     match SoftAsciiString::from_string(non_ascii_input) {
-        Ok(okvalue) => panic!("the string should not have been ascii"),
+        Ok(ok_value) => panic!("the string should not have been ascii"),
         Err(err) => {
             let original_source: String = err.into_source();
             println!("the input was: {:?}", original_source)
@@ -126,19 +123,18 @@ fn main() {
 }
 ```
 
-
-
-
-## License
+License
+-------
 
 Licensed under either of
 
- * Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
- * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+- MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
 
 at your option.
 
-### Contribution
+Contribution
+------------
 
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any

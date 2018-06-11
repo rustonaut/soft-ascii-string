@@ -25,14 +25,14 @@ use soft_string::SoftAsciiString;
 
 /// A `str` wrapper adding a "is us-ascii" soft constraint.
 ///
-/// This means that it should be ascii but is not guranteed to be
-/// ascii. Which means non ascii chars _are not a safty issue_ just
+/// This means that it should be ascii but is not guaranteed to be
+/// ascii. Which means non ascii chars _are not a safety issue_ just
 /// a potential bug.
 ///
-/// This is usefull for siturations where:
-///   1. you would have many unsafe from str conversions/"unessesary" checks with a
+/// This is useful for situations where:
+///   1. you would have many unsafe from str conversions/"unnecessary" checks with a
 ///      strict AsciiStr
-///   2. you rarely have to strictly rely on the value beeing ascii
+///   2. you rarely have to strictly rely on the value being ascii
 ///
 ///
 /// # Note
@@ -48,7 +48,7 @@ pub struct SoftAsciiStr(str);
 
 
 impl SoftAsciiStr {
-    
+
     #[inline(always)]
     pub fn from_str_unchecked(s: &str) -> &SoftAsciiStr {
         unsafe { &*( s as *const str as *const SoftAsciiStr) }
@@ -128,12 +128,12 @@ impl SoftAsciiStr {
     }
 
     /// returns a mutable `str` reference to the inner buffer
-    /// 
-    /// # Soft Constriant
+    ///
+    /// # Soft Constraint
     /// be aware that it is very easy to introduce bugs when
     /// directly editing a `SoftAsciiStr` as an `str`. Still
-    /// compared to a AsciiStr implementation this won't 
-    /// introduce unsafety, just possible brakage of the
+    /// compared to a AsciiStr implementation this won't
+    /// introduce unsafety, just possible brakeage of the
     /// soft constraint that the data should be ascii.
     pub fn inner_str_mut(&mut self) -> &mut str {
         &mut self.0
@@ -142,7 +142,7 @@ impl SoftAsciiStr {
     pub fn parse<F>(&self) -> Result<F, <F as FromStr>::Err>
          where F: FromStr
     {
-        self.as_str().parse::<F>()   
+        self.as_str().parse::<F>()
     }
 }
 
@@ -200,7 +200,7 @@ macro_rules! impl_wrapping {
 }
 
 impl_wrapping! {
-    pub > 
+    pub >
     fn len(&self) -> usize,
     fn is_empty(&self) -> bool,
     fn is_char_boundary(&self, index: usize) -> bool,
@@ -302,7 +302,7 @@ impl<'a> PartialEq<&'a SoftAsciiStr> for String {
 impl<'a> PartialEq<String> for &'a SoftAsciiStr {
     fn eq(&self, other: &String) -> bool {
         self.as_str() == other.as_str()
-    }    
+    }
 }
 
 impl<'a> PartialEq<SoftAsciiStr> for str {
@@ -314,7 +314,7 @@ impl<'a> PartialEq<SoftAsciiStr> for str {
 impl PartialEq<str> for SoftAsciiStr {
     fn eq(&self, other: &str) -> bool {
         self.as_str() == other
-    } 
+    }
 }
 
 impl<'a> PartialEq<SoftAsciiStr> for Cow<'a, SoftAsciiStr> {
@@ -443,7 +443,7 @@ impl<'a> Iterator for SoftAsciiChars<'a> {
     fn next(&mut self) -> Option<Self::Item> {
         self.inner.next()
             .map(SoftAsciiChar::from_char_unchecked)
-        
+
     }
 
     #[inline]
@@ -636,8 +636,8 @@ mod test {
                 res,
                 "hy"
             );
-            
+
         }
     }
-    
+
 }
