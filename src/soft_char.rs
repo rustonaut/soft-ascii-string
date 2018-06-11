@@ -2,11 +2,11 @@ use std::cmp::PartialEq;
 use std::fmt::{self, Display};
 use std::str;
 use std::char::{
-    self, 
-    ToUppercase, ToLowercase, 
+    self,
+    ToUppercase, ToLowercase,
     EscapeDebug, EscapeDefault, EscapeUnicode
 };
-#[allow(unused_imports)]
+#[allow(unused_imports, deprecated)]
 use std::ascii::AsciiExt;
 
 use error::FromSourceError;
@@ -14,7 +14,7 @@ use error::FromSourceError;
 
 ///a `char` wrapper with a "is us-ascii" soft constraint
 #[derive(
-    Debug, Default, Copy, Clone, PartialEq, Eq, 
+    Debug, Default, Copy, Clone, PartialEq, Eq,
     PartialOrd, Ord, Hash
 )]
 pub struct SoftAsciiChar(char);
