@@ -140,3 +140,10 @@ Contribution
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any
 additional terms or conditions.
+
+Change Log
+----------
+
+- `v1.0`
+  - added `from_unchecked` to `SoftAsciiChar`, `SoftAsciiStr`, `SoftAsciiString`
+  - deprecated `from_char_unchecked`, `from_str_unchecked`, `from_string_unchecked`
