@@ -1,13 +1,16 @@
 [package]
 name = "soft-ascii-string"
-version = "1.0.0"
-authors = ["Philipp Korber <p.korber@1aim.com>"]
+version = "1.0.1"
+authors = ["Philipp Korber <p.korber@dac.eu>"]
 keywords = [ "ascii", "string", "safe" ]
 description = "char/str/string wrappers which add a \"is-ascii\" soft constraint"
 readme="./README.md"
 documentation="https://docs.rs/soft-ascii-string"
 categories = []
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/1aim/soft-ascii-string"
+repository = "https://github.com/dac-gmbh/soft-ascii-string"
 
 [dependencies]
+
+[badges]
+maintenance = { status = "passively-maintained" }
