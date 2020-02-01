@@ -1,6 +1,6 @@
 [package]
 name = "soft-ascii-string"
-version = "1.0.1"
+version = "1.1.0"
 authors = ["Philipp Korber <p.korber@dac.eu>"]
 keywords = [ "ascii", "string", "safe" ]
 description = "char/str/string wrappers which add a \"is-ascii\" soft constraint"
