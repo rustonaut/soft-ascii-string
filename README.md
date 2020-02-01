@@ -147,3 +147,12 @@ Change Log
 - `v1.0`
   - added `from_unchecked` to `SoftAsciiChar`, `SoftAsciiStr`, `SoftAsciiString`
   - deprecated `from_char_unchecked`, `from_str_unchecked`, `from_string_unchecked`
+
+- `v1.0.1`
+  - updated metadata (author email, repository link and maintenance badge)
+
+- `v1.1.0`
+  - added `#[repr(transparent)]` (thanks to lo48576/YOSHIOKA Takuma)
+  - deprecated `trim_left`,`trim_right`,`slice_unchecked`
+  - added `trim_start`,`trim_end`, `get_unchecked` (limited to `Range*<usize>`
+    and `RangeFull` indices).
