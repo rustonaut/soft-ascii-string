@@ -44,6 +44,11 @@ use soft_string::SoftAsciiString;
 /// Once it gets stabilized (rust #27721/#35729) implementations
 /// can be added
 #[derive(Debug,  PartialEq, Eq, PartialOrd, Ord, Hash)]
+// `repr(transparent)` ensures that the internal layout of
+// `SoftAsciiStr` is same as that of `str`.
+// Without this, `from_unchecked` and `from_unchecked_mut`
+// are unsound.
+#[repr(transparent)]
 pub struct SoftAsciiStr(str);
 
 
