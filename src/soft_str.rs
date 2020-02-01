@@ -13,6 +13,7 @@ use std::net::{ToSocketAddrs, SocketAddr};
 use std::str::{self, FromStr, EncodeUtf16};
 use std::{vec, io};
 use std::iter::{Iterator, DoubleEndedIterator};
+
 // this import will become unused in future rust versions
 // but won't be removed for now for supporting current
 // rust versions
@@ -134,9 +135,36 @@ impl SoftAsciiStr {
         (SoftAsciiStr::from_unchecked(left), SoftAsciiStr::from_unchecked(right))
     }
 
+    #[deprecated(since="1.1.0", note="deprecated in std")]
     pub unsafe fn slice_unchecked(&self, begin: usize, end: usize) -> &SoftAsciiStr {
+        #[allow(deprecated)]
         SoftAsciiStr::from_unchecked(self.as_str().slice_unchecked(begin, end))
     }
+
+    /// Proxy of [`std::str::get_unchecked`].
+    ///
+    /// Currently limited to the various range types:
+    ///
+    /// - `Range<usize>`
+    /// - `RangeInclusive<usize>`
+    /// - `RangeFrom<usize>`
+    /// - `RangeTo<usize>`
+    /// - `RangeToInclusive<usize>`
+    /// - `RangeFull`
+    ///
+    /// Once all methods on `SliceIndex` are stable this
+    /// can be implemented using `SliceIndex<SoftAsciiStr>`
+    /// bounds.
+    ///
+    /// [`std::str::get_unchecked`]: https://doc.rust-lang.org/std/primitive.str.html#method.get_unchecked
+    pub unsafe fn get_unchecked<I>(&self, index: I) -> &SoftAsciiStr
+    where
+        I: hidden::TempSliceIndexHelper
+    {
+        SoftAsciiStr::from_unchecked(self.as_str().get_unchecked::<I>(index))
+    }
+
+
 
     /// returns a mutable `str` reference to the inner buffer
     ///
@@ -155,6 +183,31 @@ impl SoftAsciiStr {
     {
         self.as_str().parse::<F>()
     }
+}
+
+mod hidden {
+    use std::slice::SliceIndex;
+    use std::ops::{Range, RangeFrom, RangeTo, RangeFull, RangeToInclusive, RangeInclusive};
+
+    /// This is a workaround to be able to provide `get_unchecked` by now on stable.
+    ///
+    /// The problem is that we can't yet implement `SliceIndex<SoftAsciiStr>` as the
+    /// methods of that trait are unstable. We also can't use `SliceIndex<SoftAsciiStr>`
+    /// as where bound as this will lead to a braking change when we add support for
+    /// `SliceIndex<SoftAsciiStr>` in the future.
+    ///
+    /// So instead we add this "helper" trait and prevent custom implementations of
+    /// it by not re-exporting it.
+    //NIT[rustc/sealed]: When/if rust provides a mechanism for sealed traits use that instead.
+    pub trait TempSliceIndexHelper: SliceIndex<str, Output=str> {}
+
+    impl TempSliceIndexHelper for Range<usize> {}
+    impl TempSliceIndexHelper for RangeInclusive<usize> {}
+    impl TempSliceIndexHelper for RangeFrom<usize> {}
+    impl TempSliceIndexHelper for RangeTo<usize> {}
+    impl TempSliceIndexHelper for RangeToInclusive<usize> {}
+    impl TempSliceIndexHelper for RangeFull {}
+
 }
 
 //TODO FromStr with custom error
@@ -180,13 +233,20 @@ impl_wrap_returning_string!{
 }
 
 macro_rules! impl_wrap_returning_str {
-    (pub > $(fn $name:ident(&self$(, $param:ident: $tp:ty)*)),*) => (
+    (pub > $(
+        $(#[$attr:meta])*
+        fn $name:ident(&self$(, $param:ident: $tp:ty)*)
+        $(#[$inner_attr:meta])*
+    ),*) => (
         impl SoftAsciiStr {$(
+            $(#[$attr])*
             #[inline]
             pub fn $name(&self $(, $param: $tp)*) -> &SoftAsciiStr {
                 let as_str = self.as_str();
-                let res = str::$name(as_str $(, $param)*);
-                SoftAsciiStr::from_unchecked(res)
+                $(#[$inner_attr])* {
+                    let res = str::$name(as_str $(, $param)*);
+                    SoftAsciiStr::from_unchecked(res)
+                }
             }
         )*}
     );
@@ -194,8 +254,12 @@ macro_rules! impl_wrap_returning_str {
 
 impl_wrap_returning_str!{
     pub >
-    fn trim_right(&self),
-    fn trim_left(&self),
+    #[deprecated(since="1.1.0", note="deprecated in std")]
+    fn trim_right(&self) #[allow(deprecated)],
+    #[deprecated(since="1.1.0", note="deprecated in std")]
+    fn trim_left(&self) #[allow(deprecated)],
+    fn trim_end(&self),
+    fn trim_start(&self),
     fn trim(&self)
 }
 
@@ -618,6 +682,7 @@ mod test {
         #![allow(non_snake_case)]
         use super::*;
         use super::super::SoftAsciiStr;
+        use std::ops::{Range, RangeInclusive, RangeFrom, RangeTo, RangeToInclusive, RangeFull};
 
         #[test]
         fn from_str() {
@@ -648,6 +713,16 @@ mod test {
                 "hy"
             );
 
+        }
+
+        #[test]
+        fn compile_bounds__get_unchecked() {
+            let _ = SoftAsciiStr::get_unchecked::<Range<usize>>;
+            let _ = SoftAsciiStr::get_unchecked::<RangeInclusive<usize>>;
+            let _ = SoftAsciiStr::get_unchecked::<RangeFrom<usize>>;
+            let _ = SoftAsciiStr::get_unchecked::<RangeTo<usize>>;
+            let _ = SoftAsciiStr::get_unchecked::<RangeToInclusive<usize>>;
+            let _ = SoftAsciiStr::get_unchecked::<RangeFull>;
         }
     }
 
